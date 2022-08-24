@@ -74,7 +74,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 5])
                   await network.provider.send("evm_mine", [])
                   await lottery.performUpkeep([])
-                  const lotteryState = lottery.getLotteryState()
+                  const lotteryState = await lottery.getLotteryState()
                   const { upKeepNeeded } = await lottery.callStatic.checkUpkeep([])
                   assert.equal(lotteryState.toString(), "1")
                   assert.equal(upKeepNeeded, false)
