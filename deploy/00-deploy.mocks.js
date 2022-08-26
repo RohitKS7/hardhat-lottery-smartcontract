@@ -1,7 +1,7 @@
 const { developmentChains } = require("../helper-hardhat-config")
 const { network, ethers } = require("hardhat")
 
-const BASE_FEE = ethers.utils.parseEther("0.25") // 0.25 is premium written in "supported networks" section of Chainlink Randomness page.
+const BASE_FEE = "25000000000000000" // 0.25 is premium written in "supported networks" section of Chainlink Randomness page.
 // It costs 0.25 LINK per call for random word
 const GAS_PRICE_LINK = 1e9 // 1000000000 // link per gas
 
