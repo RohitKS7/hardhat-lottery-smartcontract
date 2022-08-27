@@ -143,7 +143,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   //   2. run fulfillRandomWords (mock being chainklink VRF)
                   //   3. We will have to wait for the fulfillRandomWords to be called on testnet but not on local chain. So, we'll stimulate testnet's conditon here. In order to do this have to listen to listener here.
                   await new Promise(async (resolve, reject) => {
-                      NOTE // If these Promise didn't resolve in "mocha timeout" (see hardhat.config) time Limit then these test will fail
+                      // NOTE If these Promise didn't resolve in "mocha timeout" (see hardhat.config) time Limit then these test will fail
                       //   once WinnerPicked events emitted (available in lottery.sol) try and catch
                       lottery.once("WinnerPicked", async () => {
                           console.log("Found the events")
@@ -169,7 +169,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                       //     setting up the listener
                       //    below, we will fire the event, and the listener will pick the winner, and retuns it
                       const tx = await lottery.performUpkeep([])
-                      const txReceipt = tx.wait(1)
+                      const txReceipt = await tx.wait(1)
                       await vrfCoordinatorV2Mock.fulfillRandomWords(
                           txReceipt.events[1].args.requestId,
                           lottery.address
