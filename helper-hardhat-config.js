@@ -5,17 +5,17 @@ const networkConfig = {
     // },
     31337: {
         name: "localhost",
-        entranceFee: ethers.utils.parseEther("0.1"), // 0.1 ETH
+        entranceFee: "100000000000000000", // 0.1 ETH
         // subscriptionId: "588",
         gaslane: "0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15", // 30 gwei
         callbackGasLimit: "500000", // 500,000 gas
-        interval: "30",
+        interval: "1",
     },
     5: {
         name: "goreli",
         vrfCoordinatorV2: "0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D",
         subscriptionId: "0",
-        entranceFee: "1000000000000000000", // 0.1 ETH
+        entranceFee: "100000000000000000", // 0.1 ETH
         gaslane: "0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15", // 30 gwei
         callbackGasLimit: "500000", // 500,000 gas
         interval: "30",

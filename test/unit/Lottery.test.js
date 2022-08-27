@@ -110,9 +110,82 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   const txReceipt = await txResposne.wait(1)
                   const lotteryState = await lottery.getLotteryState()
                   //   NOTE  // we are getting this emit event from VRFCoordinator contract directly
-                  const requestId = txReceipt.event[1].args.requestId
+                  const requestId = txReceipt.events[1].args.requestId
                   assert(requestId.toNumber() > 0)
-                  //   assert(lotteryState.toNumber() == 1)
+                  assert(lotteryState.toString() == "1")
+              })
+          })
+
+          describe("fulfillRandomWords", () => {
+              beforeEach(async () => {
+                  await lottery.enterLottery({ value: lotteryEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+              })
+
+              //   IT basically puts all things together at one spot
+              it("picks a winner, resets the lottery, and sends money", async () => {
+                  //   adding more fake accounts to enter in our lottery
+                  const accounts = await ethers.getSigners()
+                  const startingAccountIndex = 1 // since deployer is 0. New accounts will starts from index 1
+                  const additionalEntrances = 3
+                  for (let i = startingAccountIndex; i <= additionalEntrances; i++) {
+                      // we're gonna connect new accounts with our lottery contract
+                      const accountConnectedLottery = lottery.connect(accounts[i])
+                      await accountConnectedLottery.enterLottery({ value: lotteryEntranceFee })
+                  }
+
+                  // Now we've to capture the startingTimeStamp
+                  const startingTimeStamp = await lottery.getLastTimeStamp()
+
+                  //     TODO STEPS //
+                  //   1. run performUpkeep (mock being chainlink keeepers)
+                  //   2. run fulfillRandomWords (mock being chainklink VRF)
+                  //   3. We will have to wait for the fulfillRandomWords to be called on testnet but not on local chain. So, we'll stimulate testnet's conditon here. In order to do this have to listen to listener here.
+                  await new Promise(async (resolve, reject) => {
+                      NOTE // If these Promise didn't resolve in "mocha timeout" (see hardhat.config) time Limit then these test will fail
+                      //   once WinnerPicked events emitted (available in lottery.sol) try and catch
+                      lottery.once("WinnerPicked", async () => {
+                          console.log("Found the events")
+                          try {
+                              // checking every conditions in fulfillrandomwords function in lottery.sol
+                              const recentWinner = await lottery.getRecentwinner()
+                              console.log(recentWinner)
+                              console.log(accounts[0].address)
+                              console.log(accounts[1].address)
+                              console.log(accounts[2].address)
+                              console.log(accounts[3].address)
+                              const lotteryState = await lottery.getLotteryState()
+                              const playersCount = await lottery.getNumberOfPlayers()
+                              const endingTimeStamp = await lottery.getLastTimeStamp()
+                              assert.equal(playersCount.toString(), "0")
+                              assert.equal(lotteryState.toString(), "0")
+                              assert(endingTimeStamp > startingTimeStamp)
+                          } catch (e) {
+                              reject(e)
+                          }
+                          resolve()
+                      })
+                      //     setting up the listener
+                      //    below, we will fire the event, and the listener will pick the winner, and retuns it
+                      const tx = await lottery.performUpkeep([])
+                      const txReceipt = tx.wait(1)
+                      await vrfCoordinatorV2Mock.fulfillRandomWords(
+                          txReceipt.events[1].args.requestId,
+                          lottery.address
+                      )
+                  })
               })
           })
       })
+//   it("Can only be called after performupkeep requested a RandomWord from vrfCoordinator contract", async () => {
+//     // NOTE // this mock contract calls these function. fulfillRandomWords function takes 2 parameters (requestId, Consumer Address) and reverts when there's a false call for randomword
+//     await expect(
+//         vrfCoordinatorV2Mock.fulfillRandomWords(0, lottery.address)
+//     ).to.be.revertedWith("nonexistent request")
+
+//     //   TODO // Doing same thing with different RequestId
+//     await expect(
+//         vrfCoordinatorV2Mock.fulfillRandomWords(1, lottery.address)
+//     ).to.be.revertedWith("nonexistent request")
+// })
