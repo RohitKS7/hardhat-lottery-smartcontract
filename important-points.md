@@ -31,3 +31,11 @@ For doing this tasks we will be using chainlink orcale to get :
 2. Viewing Events on Etherscan
 3. Working with Events in Hardhat
    `see what are events in events.md file!!`
+
+# Getting SubId for Chainlink VRF and Registering to Chianlink Keepers
+
+1. Get out SubId for Chainlink VRF from chainlink VRF page.
+2. Deploy our contract using the SubId
+3. Register the contract with chainlink VRF & it's subId
+4. Register the contract with chainlink Keepers
+5. Run Staging Tests
