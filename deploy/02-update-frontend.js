@@ -21,7 +21,7 @@ async function updateCurrentAddresses() {
     const contractAddresses = JSON.parse(fs.readFileSync(frontEndContractsFile, "utf8"))
     const chainId = network.config.chainId.toString()
     if (chainId in contractAddresses) {
-        if (!contractAddresses[chainId].inculdes(lottery.address)) {
+        if (!contractAddresses[chainId].includes(lottery.address)) {
             contractAddresses[chainId].push(lottery.address)
         }
     } else {
